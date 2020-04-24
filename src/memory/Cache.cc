@@ -164,14 +164,6 @@ void Cache::setBlock(unsigned set_id,
 		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in setBlock!" << std::endl;
 		seen_core_access = true;
 	}
-	
-	// if (core_id >= 0 && !core_list_set[core_id]) {
-	// 	std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in setBlock!" << std::endl;
-	// 	core_list_set[core_id] = true;
-	// } else if (!seen_core_set) {
-	// 	std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in setBlock!" << std::endl;
-	// 	seen_core_set = true;
-	// }
 }
 
 
@@ -210,14 +202,6 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in AccessBlock!" << std::endl;
 		seen_core_access = true;
 	}
-
-	if (core_id >= 0 && !core_list_access[core_id]) {
-		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in AccessBlock!" << std::endl;
-		core_list_access[core_id] = true;
-	} else if (!seen_core_access) {
-		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in AccessBlock!" << std::endl;
-		seen_core_access = true;
-	}
 }
 
 
@@ -230,15 +214,6 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in ReplaceBlock!" << std::endl;
 		seen_core_replace = true;
 	}
-
-	// if (core_id >= 0 && !core_list_replace[core_id]) {
-	// 	std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in ReplaceBlock!" << std::endl;
-	// 	core_list_replace[core_id] = true;
-	// } else if (!seen_core_replace) {
-	// 	std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in ReplaceBlock!" << std::endl;
-	// 	seen_core_replace = true;
-	// }
-
 
 	// For LRU and FIFO replacement policies, return the block at the end of
 	// the block list in the set.
