@@ -386,7 +386,7 @@ public:
         for (unsigned i = 0; i < m_size; i++){
             unsigned curr_way_id = (*iter)->way_id;
 
-            if (way_owner[curr_way_id] == core_id){
+            if (set->way_owner[curr_way_id] == core_id){
                 return *iter;
             }
             iter--;
@@ -400,7 +400,7 @@ public:
         // for later: choose lowest priority way instead of first found
         for (unsigned i = 0; i < num_cores; i++){
             unsigned victim_way = (num_cores * i) + core_id;
-            if (way_owner[victim_way] != core_id){
+            if (set->way_owner[victim_way] != core_id){
                 return getBlock(set_id, victim_way);
             }
         }
