@@ -26,6 +26,7 @@
 #include <lib/cpp/String.h>
 
 #include <limits>
+#include <vector>
 
 
 namespace mem
@@ -152,7 +153,7 @@ private:
 		std::unique_ptr<int[]> way_owner;
 
 		// Array of block lists for each core
-		std::unique_ptr<misc::List<Block>[]> core_lru_list;
+		std::vector< misc::List<Block> > core_lru_list;
 	};
 
 	// Name of the cache, used for debugging purposes
