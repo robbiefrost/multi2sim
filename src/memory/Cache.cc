@@ -223,12 +223,12 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 			std::cout << "access 2 core=" << core_id << std::endl;
 		} else {
 		// } else if (set->core_lru_list[core_id].getSize() > 1) {
-			std::cout << "access 3 core=" << core_id << " count=" << set->core_access_count[core_id];
+			std::cout << "access 3 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores];
 			std::cout << " list size=" << set->core_lru_list[core_id].getSize() << std::endl;
 			set->core_lru_list[core_id].Erase(block->lru_node);
-			std::cout << "access 3.5 core=" << core_id << std::endl;
+			std::cout << "access 3.5 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores] << std::endl;
 			set->core_lru_list[core_id].PushFront(block->lru_node);
-			std::cout << "access 4 core=" << core_id << " count=" << set->core_access_count[core_id] << std::endl;
+			std::cout << "access 4 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores] << std::endl;
 		}
 	}
 
@@ -283,7 +283,7 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		// Larger share of accesses and ways available to steal from shared
 		// What is the right baseline ratio?
 		std::cout << "replace 1 core=" << core_id << std::endl;
-		if (set->lru_list.getSize() > 1
+		if (set->lru_list.getSize() > 0
 				&& access_ratio > 1.1 / (float)num_cores)
 		{
 			// Get block from the shared LRU list
