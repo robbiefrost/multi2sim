@@ -217,15 +217,16 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 
 		// Promote
 		if (set->way_owner[way_id] == -1) {
-			std::cout << "access 1" << std::endl;
+			std::cout << "access 1 core=" << core_id << std::endl;
 			set->lru_list.Erase(block->lru_node);
 			set->lru_list.PushFront(block->lru_node);
-			std::cout << "access 2" << std::endl;
+			std::cout << "access 2 core=" << core_id << std::endl;
 		} else {
-			std::cout << "access 3" << std::endl;
+		// } else if (set->core_lru_list[core_id].getSize() > 1) {
+			std::cout << "access 3 core=" << core_id << std::endl;
 			set->core_lru_list[core_id].Erase(block->lru_node);
 			set->core_lru_list[core_id].PushFront(block->lru_node);
-			std::cout << "access 4" << std::endl;
+			std::cout << "access 4 core=" << core_id << std::endl;
 		}
 	}
 
@@ -279,12 +280,12 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		Block *block;
 		// Larger share of accesses and ways available to steal from shared
 		// What is the right baseline ratio?
-		std::cout << "replace 1" << std::endl;
+		std::cout << "replace 1 core=" << core_id << std::endl;
 		if (set->lru_list.getSize() > 1
 				&& access_ratio > 1.1 / (float)num_cores)
 		{
 			// Get block from the shared LRU list
-			std::cout << "replace 2" << std::endl;
+			std::cout << "replace 2 core=" << core_id << std::endl;
 			block = misc::cast<Block *>(set->lru_list.Back());
 
 			// Erase from the shared list and add to the head of this core's list
@@ -296,14 +297,14 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 			// reset counters
 			resetAccessCount(set_id, core_id);
-			std::cout << "replace 3" << std::endl;
+			std::cout << "replace 3 core=" << core_id << std::endl;
 		}
 		// Smaller share of accesses and ways available to return to shared
 		else if (set->core_lru_list[core_id].getSize() > 1
 				&& access_ratio < 0.9 / (float)num_cores)
 		{
 			// Get block from own list
-			std::cout << "replace 4" << std::endl;
+			std::cout << "replace 4 core=" << core_id << std::endl;
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
 			// Move to head of own list
@@ -315,11 +316,11 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 			// reset counters
 			resetAccessCount(set_id, core_id);
-			std::cout << "replace 5" << std::endl;
+			std::cout << "replace 5 core=" << core_id << std::endl;
 		}
 		else {
 			// Get block from core's list
-			std::cout << "replace 6" << std::endl;
+			std::cout << "replace 6 core=" << core_id << std::endl;
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
 			// Move to head of own list
@@ -327,7 +328,7 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 				set->core_lru_list[core_id].Erase(block->lru_node);
 				set->core_lru_list[core_id].PushFront(block->lru_node);
 			}
-			std::cout << "replace 7" << std::endl;
+			std::cout << "replace 7 core=" << core_id << std::endl;
 		}
 
 		return block->way_id;
@@ -384,8 +385,8 @@ void Cache::setNumCores(int num_cores)
 				// Initialize counts to 0
 				set->core_access_count[core_id] = 0;
 			}
-			// Initialize overall count to a higher number so ways don't start stealing too much at the start.
-			set->core_access_count[num_cores] = 100;
+			// Initialize overall count to a higher number so ways don't start stealing immediately
+			set->core_access_count[num_cores] = num_cores;
 
 			set->way_owner = misc::new_unique_array<int>(num_ways);
 			for (unsigned way_id = 0; way_id < num_ways; way_id++) {
