@@ -313,8 +313,10 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
 			// Move to head of own list
-			set->core_lru_list[core_id].Erase(block->lru_node);
-			set->core_lru_list[core_id].PushFront(block->lru_node);
+			if (set->core_lru_list[core_id].getSize() > 1) {
+				set->core_lru_list[core_id].Erase(block->lru_node);
+				set->core_lru_list[core_id].PushFront(block->lru_node);
+			}
 		}
 
 		return block->way_id;
