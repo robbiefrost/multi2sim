@@ -147,7 +147,7 @@ void Cache::setBlock(unsigned set_id,
 			way_id,
 			tag,
 			BlockStateMap[state]);
-	
+
 	// Get set and block
 	Set *set = getSet(set_id);
 	Block *block = getBlock(set_id, way_id);
@@ -160,6 +160,17 @@ void Cache::setBlock(unsigned set_id,
 		set->lru_list.Erase(block->lru_node);
 		set->lru_list.PushFront(block->lru_node);
 	}
+
+	// Increment counters for LRU with Partitioning
+	if (replacement_policy == ReplacementLRUPartition) {
+		set->core_access_count[core_id]++;
+		set->core_access_count[num_cores]++;
+	}
+
+	// Increment frequency counter for FLRU
+	if (replacement_policy == ReplacementFLRU){
+        block->counter++;
+    }
 
 	// Set new values for block
 	block->tag = tag;
@@ -204,7 +215,14 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 		set->core_access_count[core_id]++;
 		set->core_access_count[num_cores]++;
 
-		// Promote (to do)
+		// Promote
+		if (set->way_owner[way_id] == -1) {
+			set->lru_list.Erase(block->lru_node);
+			set->lru_list.PushFront(block->lru_node);
+		} else {
+			set->core_lru_list[core_id].Erase(block->lru_node);
+			set->core_lru_list[core_id].PushFront(block->lru_node);
+		}
 	}
 
     if (replacement_policy == ReplacementFLRU){
@@ -251,33 +269,59 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		return block->way_id;
 	}
 
-	// if (replacement_policy == ReplacementLRUPartition) {
-	// 	float access_ratio = (float)set->core_access_count[core_id] / (float)set->core_access_count[num_cores];
-	// 	if (access_ratio > 1.0 / (float)num_cores) {
-	// 		// Check to see if there is a shared block to evict
-	// 		if (set->lru_list.getSize() > 1) {
-	// 			// Get block from the shared LRU list
-	// 			Block *block = misc::cast<Block *>(set->lru_list.Back());
+	// LRU with cache partitioning
+	if (replacement_policy == ReplacementLRUPartition) {
+		float access_ratio = (float)set->core_access_count[core_id] / (float)set->core_access_count[num_cores];
+		Block *block;
+		// Larger share of accesses and ways available to steal from shared
+		// What is the right baseline ratio?
+		if (set->lru_list.getSize() > 1
+				&& access_ratio > 1.1 / (float)num_cores)
+		{
+			// Get block from the shared LRU list
+			block = misc::cast<Block *>(set->lru_list.Back());
 
-	// 			// Erase from the shared list and add to the head of this core's list
-	// 			set->lru_list.Erase(block->lru_node);
-	// 			set->core_lru_list[core_id].PushFront(block->lru_node);
-	// 		}
+			// Erase from the shared list and add to the head of this core's list
+			set->lru_list.Erase(block->lru_node);
+			set->core_lru_list[core_id].PushFront(block->lru_node);
 			
-			
-	// 		if (!block) {
+			// update way_owner
+			set->way_owner[block->way_id] = core_id;
 
-	// 		}
+			// reset counters
+			resetAccessCount(set_id, core_id);
+		}
+		// Smaller share of accesses and ways available to return to shared
+		else if (set->core_lru_list[core_id].getSize() > 1
+				&& access_ratio < 0.9 / (float)num_cores)
+		{
+			// Get block from own list
+			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
-	// 		set->lru_list.
+			// Move to head of own list
+			set->core_lru_list[core_id].Erase(block->lru_node);
+			set->core_lru_list[core_id].PushFront(block->lru_node);
 
-	// 		return block->way_id;
-	// 	}
-	// 	Block *block = misc::cast<Block *>()
+			//update way_owner
+			set->way_owner[block->way_id] = -1;
 
-	// 	return block->way_id;
-	// }
+			// reset counters
+			resetAccessCount(set_id, core_id);
+		}
+		else {
+			// Get block from core's list
+			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
+			// Move to head of own list
+			set->core_lru_list[core_id].Erase(block->lru_node);
+			set->core_lru_list[core_id].PushFront(block->lru_node);
+		}
+
+		return block->way_id;
+	}
+
+
+	// FLRU Replacement Policy
 	if (replacement_policy == ReplacementFLRU){
 
         Block *block = nullptr;
@@ -332,9 +376,12 @@ void Cache::setNumCores(int num_cores)
 					set->lru_list.PushBack(block->lru_node);
 				}
 			}
+			// Initialize counts to 0
 			for (int core_id=0; core_id<num_cores; core_id++) {
 				set->core_access_count[core_id] = 0;
 			}
+			// Initialize overall count to a higher number so ways don't start stealing too much at the start.
+			set->core_access_count[num_cores] = 100;
 		}
 	}
 	

@@ -345,8 +345,20 @@ public:
 	/// Return the log2 of the block size
 	int getLogBlockSize() const { return log_block_size; }
 
+	///
+	/// *** helper functions to handle dynamic set partitioning
+	///
+
 	/// Set the number of cores
 	void setNumCores(int num_cores);
+
+	/// Resets access count to an equal share of the accesses
+	void resetAccessCount(int set_id, int core_id) {
+		Set *set = getSet(set_id);
+		unsigned new_count = set->core_access_count[num_cores] / num_cores;
+		set->core_access_count[num_cores] -= (set->core_access_count[core_id] - new_count);
+		set->core_access_count[core_id] = new_count;
+	}
 
 	///
 	/// *** helper functions for FLRU ***
@@ -406,9 +418,7 @@ public:
                 return getBlock(set_id, victim_way);
             }
         }
-
         return nullptr;
-
     };
 
 };
