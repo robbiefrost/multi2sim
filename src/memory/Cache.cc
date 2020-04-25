@@ -387,6 +387,7 @@ void Cache::setNumCores(int num_cores)
 				}
 			}
 		}
+		std::cout << "Everything initialized" << std::endl;
 	}
 	
 	if (replacement_policy == ReplacementFLRU) {
