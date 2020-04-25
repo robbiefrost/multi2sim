@@ -356,7 +356,7 @@ public:
         Set *set = getSet(set_id);
         auto iter = set->lru_list.getTail();
         unsigned minFrequency = std::numeric_limits<unsigned int>::max();
-        Block *victimBlock = ;
+        Block *victimBlock = nullptr;
         for (unsigned i = 0; i < m_size; i++){
             if ((*iter)->counter < minFrequency){
                 victimBlock = *iter;
