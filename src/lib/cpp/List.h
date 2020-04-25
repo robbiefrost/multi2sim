@@ -152,7 +152,7 @@ public:
 	}
 
 	/// Return an iterator to the last element in the list
-	Iterator tail()
+	Iterator getTail()
 	{
 		return Iterator(tail);
 	}

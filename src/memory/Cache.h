@@ -354,7 +354,7 @@ public:
     Block* FLRUgetLowFrequency(unsigned set_id){
 
         Set *set = getSet(set_id);
-        auto iter = set->lru_list.tail();
+        auto iter = set->lru_list.getTail();
         unsigned minFrequency = std::numeric_limits<unsigned int>::max();
         Block *victimBlock = ;
         for (unsigned i = 0; i < m_size; i++){
@@ -370,7 +370,7 @@ public:
     // iterate through M LRU to find own belonging ways
     bool FLRUcheckMforBlock(unsigned set_id, unsigned way_id){
         Set *set = getSet(set_id);
-        auto iter = set->lru_list.tail();
+        auto iter = set->lru_list.getTail();
         for (unsigned i = 0; i < m_size; i++){
             if ((*iter)->way_id == way_id){ return true; }
             iter--;
@@ -382,7 +382,7 @@ public:
     // iterate through M LRU to find own belonging ways
     Block* FLRUcheckForSelf(unsigned set_id, unsigned core_id){
         Set *set = getSet(set_id);
-        auto iter = set->lru_list.tail();
+        auto iter = set->lru_list.getTail();
         for (unsigned i = 0; i < m_size; i++){
             unsigned curr_way_id = (*iter)->way_id;
 
