@@ -217,11 +217,15 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 
 		// Promote
 		if (set->way_owner[way_id] == -1) {
+			std::cout << "access 1" << endl;
 			set->lru_list.Erase(block->lru_node);
 			set->lru_list.PushFront(block->lru_node);
+			std::cout << "access 2" << endl;
 		} else {
+			std::cout << "access 3" << endl;
 			set->core_lru_list[core_id].Erase(block->lru_node);
 			set->core_lru_list[core_id].PushFront(block->lru_node);
+			std::cout << "access 4" << endl;
 		}
 	}
 
@@ -275,10 +279,12 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		Block *block;
 		// Larger share of accesses and ways available to steal from shared
 		// What is the right baseline ratio?
+		std::cout << "replace 1" << endl;
 		if (set->lru_list.getSize() > 1
 				&& access_ratio > 1.1 / (float)num_cores)
 		{
 			// Get block from the shared LRU list
+			std::cout << "replace 2" << endl;
 			block = misc::cast<Block *>(set->lru_list.Back());
 
 			// Erase from the shared list and add to the head of this core's list
@@ -290,12 +296,14 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 			// reset counters
 			resetAccessCount(set_id, core_id);
+			std::cout << "replace 3" << endl;
 		}
 		// Smaller share of accesses and ways available to return to shared
 		else if (set->core_lru_list[core_id].getSize() > 1
 				&& access_ratio < 0.9 / (float)num_cores)
 		{
 			// Get block from own list
+			std::cout << "replace 4" << endl;
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
 			// Move to head of own list
@@ -307,9 +315,11 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 			// reset counters
 			resetAccessCount(set_id, core_id);
+			std::cout << "replace 5" << endl;
 		}
 		else {
 			// Get block from core's list
+			std::cout << "replace 6" << endl;
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
 			// Move to head of own list
@@ -317,6 +327,7 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 				set->core_lru_list[core_id].Erase(block->lru_node);
 				set->core_lru_list[core_id].PushFront(block->lru_node);
 			}
+			std::cout << "replace 7" << endl;
 		}
 
 		return block->way_id;
@@ -389,7 +400,6 @@ void Cache::setNumCores(int num_cores)
 				}
 			}
 		}
-		std::cout << "Everything initialized" << std::endl;
 	}
 	
 	if (replacement_policy == ReplacementFLRU) {
