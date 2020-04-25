@@ -12,4 +12,4 @@ $M2SROOT/bin/m2s --x86-sim detailed --x86-config x86-config.ini \
 		--ctx-config ctx-config.ini
 
 
-m2s --x86-sim detailed --x86-config x86-config.ini --mem-config mem-config-lru test-threads 4
+m2s --x86-sim detailed --x86-config x86-config.ini --mem-config mem-config-lru.ini test-threads 4
