@@ -1183,6 +1183,7 @@ void System::EventFindAndLockHandler(esim::Event *event,
 			}
 
 			// Find a victim to evict, only in up-down accesses.
+			// This is where frames get assigned their way!!
 			assert(!frame->way);
 			frame->way = cache->ReplaceBlock(frame->set, frame->core_id);
 		}

@@ -39,7 +39,9 @@ public:
 		ReplacementInvalid,
 		ReplacementLRU,
 		ReplacementFIFO,
-		ReplacementRandom
+		ReplacementRandom,
+		ReplacementLRUPartition,
+		ReplacementFLRU
 	};
 
 	/// String map for ReplacementPolicy
@@ -92,6 +94,9 @@ public:
 
 		// The block belongs to an LRU list
 		misc::List<Block>::Node lru_node;
+
+		// *** Access frequency counter ***
+		unsigned counter = 0;
 	
 	public:
 
@@ -133,6 +138,19 @@ private:
 
 		// Position in Cache::blocks where the blocks start for this set
 		Block *blocks;
+
+		//
+		// Additions to handle set partitions
+		// 
+
+		// Array to hold the number of times a core is accessed
+		std::unique_ptr<unsigned[]> core_access_count;
+
+		// Array to track which core owns which ways
+		std::unique_ptr<int[]> way_owner;
+
+		// Array of block lists for each core
+		std::unique_ptr<misc::List<Block>[]> core_lru_list;
 	};
 
 	// Name of the cache, used for debugging purposes
@@ -153,8 +171,10 @@ private:
 	int log_block_size;
 
 	// Number of cores in architecture
-	// Added for set partitioning
 	unsigned num_cores = 1;
+
+	// Size of M set for FLRU
+	unsigned m_size = 1;
 
 	// Block replacement policy
 	ReplacementPolicy replacement_policy;
@@ -281,12 +301,10 @@ public:
 	/// Mark a block as last accessed as per the LRU policy. This function
 	/// internally updates the linked list that keeps track of the LRU order
 	/// of the blocks in a set.
-	/// Adding in core_id
 	void AccessBlock(unsigned set_id, unsigned way_id, int core_id);
 
 	/// Return the way index of the block to be replaced in the given set,
 	/// as per the current block replacement policy.
-	/// Adding in core_id
 	unsigned ReplaceBlock(unsigned set_id, int core_id);
 
 	/// Set the transient tag of a block.
@@ -295,18 +313,6 @@ public:
 		Block *block = getBlock(set_id, way_id);
 		block->transient_tag = tag;
 	}
-
-	bool seen_core_set = false;
-	bool seen_core_access = false;
-	bool seen_core_replace = false;
-	/// Set the number of cores
-	void setNumCores(int num_cores)
-	{ 
-		this->num_cores = num_cores;
-		// set up lists to manage partitions
-	}
-
-
 
 	//
 	// Getters
@@ -336,6 +342,73 @@ public:
 
 	/// Return the log2 of the block size
 	int getLogBlockSize() const { return log_block_size; }
+
+	/// Set the number of cores
+	void setNumCores(int num_cores);
+
+	///
+	/// *** helper functions for FLRU ***
+	///
+
+    // find lowest frequency block in M
+    Block* FLRUgetLowFrequency(unsigned set_id){
+
+        Set *set = getSet(set_id);
+        auto iter = set->lru_list.tail();
+        unsigned minFrequency = std::numeric_limits<unsigned int>::max();
+        Block *victimBlock = ;
+        for (unsigned i = 0; i < m_size; i++){
+            if ((*iter)->counter < minFrequency){
+                victimBlock = *iter;
+                minFrequency = (*iter)->counter;
+            }
+            iter--;
+        }
+        return victimBlock;
+    };
+
+    // iterate through M LRU to find own belonging ways
+    bool FLRUcheckMforBlock(unsigned set_id, unsigned way_id){
+        Set *set = getSet(set_id);
+        auto iter = set->lru_list.tail();
+        for (unsigned i = 0; i < m_size; i++){
+            if ((*iter)->way_id == way_id){ return true; }
+            iter--;
+        }
+        return false;
+    };
+
+
+    // iterate through M LRU to find own belonging ways
+    Block* FLRUcheckForSelf(unsigned set_id, unsigned core_id){
+        Set *set = getSet(set_id);
+        auto iter = set->lru_list.tail();
+        for (unsigned i = 0; i < m_size; i++){
+            unsigned curr_way_id = (*iter)->way_id;
+
+            if (way_owner[curr_way_id] == core_id){
+                return *iter;
+            }
+            iter--;
+
+        }
+        return nullptr;
+    };
+
+    Block* FLRUcheckForStolen(unsigned set_id, unsigned core_id){
+        Set *set = getSet(set_id);
+        // for later: choose lowest priority way instead of first found
+        for (unsigned i = 0; i < num_cores; i++){
+            unsigned victim_way = (num_cores * i) + core_id;
+            if (way_owner[victim_way] != core_id){
+                return getBlock(set_id, victim_way);
+            }
+        }
+
+        return nullptr;
+
+    };
+
 };
 
 

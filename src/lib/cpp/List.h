@@ -151,6 +151,12 @@ public:
 		return Iterator(nullptr);
 	}
 
+	/// Return an iterator to the last element in the list
+	Iterator tail()
+	{
+		return Iterator(tail);
+	}
+
 	/// Return the first element in the list, or `nullptr` if the list is
 	/// empty.
 	T *Front()
@@ -268,6 +274,15 @@ public:
 	{
 		return Erase(Iterator(&node));
 	}
+
+	// *** get iterator m position
+    Iterator FLRUgetMIter(unsigned m_size){
+        auto iter = Iterator(tail);
+        for (unsigned i = 0; i < m_size-2; i++){ 
+			iter--;
+		}
+        return iter;
+    }
 };
 
 } // namespace misc

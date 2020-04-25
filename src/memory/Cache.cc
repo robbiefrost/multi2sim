@@ -28,7 +28,9 @@ const misc::StringMap Cache::ReplacementPolicyMap =
 {
 	{ "LRU", ReplacementLRU },
 	{ "FIFO", ReplacementFIFO },
-	{ "Random", ReplacementRandom }
+	{ "Random", ReplacementRandom },
+	{ "LRU-p", ReplacementLRUPartition},
+	{ "FLRU", ReplacementFLRU}
 };
 
 
@@ -84,7 +86,10 @@ Cache::Cache(const std::string &name,
 		{
 			Block *block = getBlock(set_id, way_id);
 			block->way_id = way_id;
-			set->lru_list.PushBack(block->lru_node);
+			if (replacement_policy != ReplacementLRUPartition)
+			{
+				set->lru_list.PushBack(block->lru_node);
+			}
 		}
 	}
 }
@@ -159,11 +164,6 @@ void Cache::setBlock(unsigned set_id,
 	// Set new values for block
 	block->tag = tag;
 	block->state = state;
-
-	if (!seen_core_access && core_id == 1) {
-		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in setBlock!" << std::endl;
-		seen_core_access = true;
-	}
 }
 
 
@@ -198,10 +198,33 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 		set->lru_list.PushFront(block->lru_node);
 	}
 
-	if (!seen_core_access && core_id == 1) {
-		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in AccessBlock!" << std::endl;
-		seen_core_access = true;
+	
+	if (replacement_policy == ReplacementLRUPartition) {
+		// Incerement core counter
+		set->core_access_count[core_id]++;
+		set->core_access_count[num_cores]++;
+
+		// Promote (to do)
 	}
+
+    if (replacement_policy == ReplacementFLRU){
+        // Increment frequency counter
+        block->counter++;
+
+        // Remove block from lru list
+        set->lru_list.Erase(block->lru_node);
+
+        // Promotion according to current position
+        if (FLRUcheckMforBlock(set_id, way_id)){
+            // Push to M position
+            set->lru_list.Insert(set->lru_list.FLRUgetMIter(m_size), block->lru_node);
+
+        } else {
+            // Push to MRU position
+            set->lru_list.PushFront(block->lru_node);
+        }
+
+    }
 }
 
 
@@ -209,11 +232,6 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 {
 	// Get the set
 	Set *set = getSet(set_id);
-
-	if (!seen_core_replace && core_id == 1) {
-		std::cout << "Cache: " << name << ", cores=" << num_cores << ", core " << core_id << " has been seen in ReplaceBlock!" << std::endl;
-		seen_core_replace = true;
-	}
 
 	// For LRU and FIFO replacement policies, return the block at the end of
 	// the block list in the set.
@@ -233,9 +251,102 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		return block->way_id;
 	}
 
+	// if (replacement_policy == ReplacementLRUPartition) {
+	// 	float access_ratio = (float)set->core_access_count[core_id] / (float)set->core_access_count[num_cores];
+	// 	if (access_ratio > 1.0 / (float)num_cores) {
+	// 		// Check to see if there is a shared block to evict
+	// 		if (set->lru_list.getSize() > 1) {
+	// 			// Get block from the shared LRU list
+	// 			Block *block = misc::cast<Block *>(set->lru_list.Back());
+
+	// 			// Erase from the shared list and add to the head of this core's list
+	// 			set->lru_list.Erase(block->lru_node);
+	// 			set->core_lru_list[core_id].PushFront(block->lru_node);
+	// 		}
+			
+			
+	// 		if (!block) {
+
+	// 		}
+
+	// 		set->lru_list.
+
+	// 		return block->way_id;
+	// 	}
+	// 	Block *block = misc::cast<Block *>()
+
+	// 	return block->way_id;
+	// }
+
+	if (replacement_policy == ReplacementFLRU){
+
+        Block *block = nullptr;
+        if (block = misc::cast<Block *>(FLRUcheckForSelf(set_id, core_id))){
+            // Check if belonging ways are in M
+        } else if (block = misc::cast<Block *>(FLRUcheckForStolen(set_id, core_id))){
+            // Check if own ways are stolen in cache and clear record
+        } else {
+            // Select lowest priority (lowest frequency) block as victim
+            block = misc::cast<Block *>(FLRUgetLowFrequency(set_id));
+        }
+
+        // Reset frequency counter
+        block->counter = 0;
+
+        // Record new owner of block
+        set->way_owner[block->way_id] = core_id;
+
+        // Insert node into M position
+        set->lru_list.Erase(block->lru_node);
+        set->lru_list.Insert(set->lru_list.FLRUgetMIter(m_size),
+							 block->lru_node);
+
+        return block->way_id;
+    }
+
 	// Random replacement policy
 	assert(replacement_policy == ReplacementRandom);
 	return random() % num_ways;
+}
+
+
+void Cache::setNumCores(int num_cores)
+{
+	this->num_cores = num_cores;
+	this->m_size = num_cores;
+	// if this is one of the partitioning policies
+	if (replacement_policy == ReplacementLRUPartition) {
+		for (unsigned set_id = 0; set_id < num_sets; set_id++) {
+			Set *set = getSet(set_id);
+			set->core_access_count = misc::new_unique_array<unsigned>(num_cores+1);
+			set->way_owner = misc::new_unique_array<int>(num_ways);
+			set->core_lru_list = misc::new_unique_array<misc::List<Block>>(num_cores);
+			for (unsigned way_id = 0; way_id < num_ways; way_id++) {
+				Block *block = getBlock(set_id, way_id);
+				block->way_id = way_id;
+				if (way_id < num_cores) {
+					set->way_owner[way_id] = way_id;
+					set->core_lru_list[way_id].PushBack(block->lru_node);
+				} else {
+					set->way_owner[way_id] = -1;
+					set->lru_list.PushBack(block->lru_node);
+				}
+			}
+			for (int core_id=0; core_id<num_cores; core_id++) {
+				set->core_access_count[core_id] = 0;
+			}
+		}
+	}
+	
+	if (replacement_policy == ReplacementFLRU) {
+		for (unsigned set_id = 0; set_id < num_sets; set_id++) {
+			Set *set = getSet(set_id);
+			set->way_owner = misc::new_unique_array<int>(num_ways);
+			for (unsigned way_id = 0; way_id < num_ways; way_id++) {
+				set->way_owner[way_id] = way_id % num_cores;
+			}
+		}
+	}
 }
 
 
