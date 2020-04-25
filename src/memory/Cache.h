@@ -362,7 +362,7 @@ public:
                 victimBlock = *iter;
                 minFrequency = (*iter)->counter;
             }
-            iter--;
+            --iter;
         }
         return victimBlock;
     };
@@ -373,7 +373,7 @@ public:
         auto iter = set->lru_list.getTail();
         for (unsigned i = 0; i < m_size; i++){
             if ((*iter)->way_id == way_id){ return true; }
-            iter--;
+            --iter;
         }
         return false;
     };
@@ -389,7 +389,7 @@ public:
             if (set->way_owner[curr_way_id] == core_id){
                 return *iter;
             }
-            iter--;
+            --iter;
 
         }
         return nullptr;
