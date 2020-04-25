@@ -25,6 +25,8 @@
 #include <lib/cpp/List.h>
 #include <lib/cpp/String.h>
 
+#include <limits>
+
 
 namespace mem
 {
