@@ -379,17 +379,16 @@ void Cache::setNumCores(int num_cores)
 		for (unsigned set_id = 0; set_id < num_sets; set_id++) {
 			Set *set = getSet(set_id);
 			set->core_access_count = misc::new_unique_array<unsigned>(num_cores+1);
-			// set->core_lru_list = misc::new_unique_array<misc::List<Block>>(num_cores);
+			set->core_lru_list = misc::new_unique_array< misc::List<Block> >(num_cores);
 			for (int core_id=0; core_id<num_cores; core_id++) {
 				// Initialize LRU list for each core
-				misc::List<Block> core_list;
-				set->core_lru_list.push_back(core_list);
+				// misc::List<Block> core_list;
+				// set->core_lru_list.push_back(core_list);
 				// Initialize counts to 0
 				set->core_access_count[core_id] = 0;
 			}
 			// Initialize overall count to a higher number so ways don't start stealing immediately
 			set->core_access_count[num_cores] = num_cores;
-
 			set->way_owner = misc::new_unique_array<int>(num_ways);
 			for (unsigned way_id = 0; way_id < num_ways; way_id++) {
 				Block *block = getBlock(set_id, way_id);
@@ -414,6 +413,14 @@ void Cache::setNumCores(int num_cores)
 			}
 		}
 	}
+}
+
+
+void Cache:::resetAccessCount(int set_id, int core_id) {
+	Set *set = getSet(set_id);
+	unsigned new_count = set->core_access_count[num_cores] / num_cores;
+	// set->core_access_count[num_cores] -= (set->core_access_count[core_id] - new_count);
+	set->core_access_count[core_id] = new_count;
 }
 
 

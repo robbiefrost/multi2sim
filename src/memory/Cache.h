@@ -153,7 +153,8 @@ private:
 		std::unique_ptr<int[]> way_owner;
 
 		// Array of block lists for each core
-		std::vector< misc::List<Block> > core_lru_list;
+		// std::vector< misc::List<Block> > core_lru_list;
+		std::unique_ptr< misc::List<Block>[] > core_lru_list;
 	};
 
 	// Name of the cache, used for debugging purposes
@@ -354,12 +355,7 @@ public:
 	void setNumCores(int num_cores);
 
 	/// Resets access count to an equal share of the accesses
-	void resetAccessCount(int set_id, int core_id) {
-		Set *set = getSet(set_id);
-		unsigned new_count = set->core_access_count[num_cores] / num_cores;
-		// set->core_access_count[num_cores] -= (set->core_access_count[core_id] - new_count);
-		set->core_access_count[core_id] = new_count;
-	}
+	void resetAccessCount(int set_id, int core_id);
 
 	///
 	/// *** helper functions for FLRU ***
