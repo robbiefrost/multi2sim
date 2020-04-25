@@ -357,7 +357,7 @@ public:
 	void resetAccessCount(int set_id, int core_id) {
 		Set *set = getSet(set_id);
 		unsigned new_count = set->core_access_count[num_cores] / num_cores;
-		set->core_access_count[num_cores] -= (set->core_access_count[core_id] - new_count);
+		// set->core_access_count[num_cores] -= (set->core_access_count[core_id] - new_count);
 		set->core_access_count[core_id] = new_count;
 	}
 
