@@ -1,6 +1,5 @@
 % Example to test the x86 detailed simulation with one multi-threaded
-% application running multiple concurrent threads on a CPU with 2 cores
-% each capable of running two threads.
+% application running multiple concurrent threads on a CPU with 4 cores
 % 
 % For this test first we should build the binary from the source code
 % and then use this binary for Multi2sim
@@ -13,4 +12,4 @@ $M2SROOT/bin/m2s --x86-sim detailed --x86-config x86-config.ini \
 		--ctx-config ctx-config.ini
 
 
-m2s --x86-sim detailed --x86-config x86-config.ini --mem-config mem-config.ini test-threads
+m2s --x86-sim detailed --x86-config x86-config.ini --mem-config mem-config-lru test-threads 4
