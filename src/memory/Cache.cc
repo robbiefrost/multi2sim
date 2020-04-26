@@ -317,7 +317,7 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 			// Move to head of own list
 			set->core_lru_list[core_id].Erase(block->lru_node);
-			set->core_lru_list[core_id].PushFront(block->lru_node);
+			set->lru_list.PushFront(block->lru_node);
 
 			//update way_owner
 			set->way_owner[block->way_id] = -1;
