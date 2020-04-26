@@ -235,34 +235,46 @@ public:
 		assert(position.node != nullptr);
 		assert(position.node->list == this);
 
+		std::cout << "list 1" << std::endl;
+
 		// Remove current element
 		if (size == 1)
 		{
+			std::cout << "list 2" << std::endl;
 			assert(head == position.node);
 			assert(tail == position.node);
 			head = nullptr;
 			tail = nullptr;
+			std::cout << "list 3" << std::endl;
 		}
 		else if (position.node == head)
-		{
+		{	
+			std::cout << "list 4" << std::endl;
 			position.node->next->prev = nullptr;
 			head = position.node->next;
+			std::cout << "list 5" << std::endl;
 		}
 		else if (position.node == tail)
-		{
+		{	
+			std::cout << "list 6" << std::endl;
 			position.node->prev->next = nullptr;
 			tail = position.node->prev;
+			std::cout << "list 7" << std::endl;
 		}
 		else
-		{
+		{	
+			std::cout << "list 8" << std::endl;
 			position.node->prev->next = position.node->next;
 			position.node->next->prev = position.node->prev;
+			std::cout << "list 9" << std::endl;
 		}
+		std::cout << "list 10" << std::endl;
 
 		// Mark as removed
 		position.node->list = nullptr;
 		size--;
 
+		std::cout << "list 11" << std::endl;
 		// Return iterator to next element
 		return Iterator(position.node->next);
 	}
