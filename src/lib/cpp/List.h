@@ -22,7 +22,7 @@
 
 #include <cassert>
 #include <stdlib.h>
-
+#include <stdio.h>
 
 
 namespace misc
