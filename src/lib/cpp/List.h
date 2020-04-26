@@ -21,8 +21,6 @@
 #define LIB_CPP_LINKED_LIST_H
 
 #include <cassert>
-#include <stdlib.h>
-#include <stdio.h>
 
 
 namespace misc
@@ -237,46 +235,34 @@ public:
 		assert(position.node != nullptr);
 		assert(position.node->list == this);
 
-		printf("list 1\n");
-
 		// Remove current element
 		if (size == 1)
 		{
-			printf("list 2\n");
 			assert(head == position.node);
 			assert(tail == position.node);
 			head = nullptr;
 			tail = nullptr;
-			printf("list 3\n");
 		}
 		else if (position.node == head)
-		{	
-			printf("list 4\n");
+		{
 			position.node->next->prev = nullptr;
 			head = position.node->next;
-			printf("list 5\n");
 		}
 		else if (position.node == tail)
-		{	
-			printf("list 6\n");
+		{
 			position.node->prev->next = nullptr;
 			tail = position.node->prev;
-			printf("list 7\n");
 		}
 		else
-		{	
-			printf("list 8\n");
+		{
 			position.node->prev->next = position.node->next;
 			position.node->next->prev = position.node->prev;
-			printf("list 9\n");
 		}
-		printf("list 10\n");
 
 		// Mark as removed
 		position.node->list = nullptr;
 		size--;
 
-		printf("list 11\n");
 		// Return iterator to next element
 		return Iterator(position.node->next);
 	}

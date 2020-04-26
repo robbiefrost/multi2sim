@@ -216,25 +216,12 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 
 		// Promote
 		if (set->way_owner[way_id] == -1) {
-			std::cout << "access 1 core=" << core_id << std::endl;
 			set->lru_list.Erase(block->lru_node);
 			set->lru_list.PushFront(block->lru_node);
-			std::cout << "access 2 core=" << core_id << std::endl;
-		} else {
-		// } else if (set->core_lru_list[core_id].getSize() > 1) {
-			std::cout << "access 3 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores];
-			std::cout << " list size=" << set->core_lru_list[core_id].getSize();
-			if (block) {
-				std::cout << " block way_id=" << block->way_id << "func way=" << way_id << std::endl;
-			} else {
-				std::cout << " no node :(" << std::endl;
-			}
-
+		// } else {
+		} else if (set->core_lru_list[core_id].getSize() > 1) {
 			set->core_lru_list[core_id].Erase(block->lru_node);
-			
-			std::cout << "access 3.5 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores] << std::endl;
 			set->core_lru_list[core_id].PushFront(block->lru_node);
-			std::cout << "access 4 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores] << std::endl;
 		}
 	}
 
@@ -249,7 +236,6 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
         if (FLRUcheckMforBlock(set_id, way_id)){
             // Push to M position
             set->lru_list.Insert(set->lru_list.FLRUgetMIter(m_size), block->lru_node);
-
         } else {
             // Push to MRU position
             set->lru_list.PushFront(block->lru_node);
@@ -288,12 +274,10 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		Block *block;
 		// Larger share of accesses and ways available to steal from shared
 		// What is the right baseline ratio?
-		std::cout << "replace 1 core=" << core_id << std::endl;
 		if (set->lru_list.getSize() > 0
 				&& access_ratio > 1.1 / (float)num_cores)
 		{
 			// Get block from the shared LRU list
-			std::cout << "replace 2 core=" << core_id << std::endl;
 			block = misc::cast<Block *>(set->lru_list.Back());
 
 			// Erase from the shared list and add to the head of this core's list
@@ -305,14 +289,12 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 			// reset counters
 			resetAccessCount(set_id, core_id);
-			std::cout << "replace 3 core=" << core_id << std::endl;
 		}
 		// Smaller share of accesses and ways available to return to shared
 		else if (set->core_lru_list[core_id].getSize() > 1
 				&& access_ratio < 0.9 / (float)num_cores)
 		{
 			// Get block from own list
-			std::cout << "replace 4 core=" << core_id << std::endl;
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
 			// Move to head of own list
@@ -324,11 +306,9 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 			// reset counters
 			resetAccessCount(set_id, core_id);
-			std::cout << "replace 5 core=" << core_id << std::endl;
 		}
 		else {
 			// Get block from core's list
-			std::cout << "replace 6 core=" << core_id << std::endl;
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
 			// Move to head of own list (no need to move if we have only one node)
@@ -336,7 +316,6 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 				set->core_lru_list[core_id].Erase(block->lru_node);
 				set->core_lru_list[core_id].PushFront(block->lru_node);
 			}
-			std::cout << "replace 7 core=" << core_id << std::endl;
 		}
 
 		return block->way_id;
