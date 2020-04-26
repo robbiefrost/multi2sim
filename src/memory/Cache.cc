@@ -224,7 +224,7 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 		// } else if (set->core_lru_list[core_id].getSize() > 1) {
 			std::cout << "access 3 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores];
 			std::cout << " list size=" << set->core_lru_list[core_id].getSize();
-			if (block->lru_node) {
+			if (block) {
 				std::cout << " node!" << std::endl;
 			} else {
 				std::cout << " no node :(" << std::endl;
@@ -331,7 +331,7 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 			std::cout << "replace 6 core=" << core_id << std::endl;
 			block = misc::cast<Block *>(set->core_lru_list[core_id].Back());
 
-			// Move to head of own list
+			// Move to head of own list (no need to move if we have only one node)
 			if (set->core_lru_list[core_id].getSize() > 1) {
 				set->core_lru_list[core_id].Erase(block->lru_node);
 				set->core_lru_list[core_id].PushFront(block->lru_node);
