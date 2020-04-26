@@ -379,7 +379,11 @@ void Cache::setNumCores(int num_cores)
 		for (unsigned set_id = 0; set_id < num_sets; set_id++) {
 			Set *set = getSet(set_id);
 			set->core_access_count = misc::new_unique_array<unsigned>(num_cores+1);
-			set->core_lru_list = misc::new_unique_array< misc::List<Block> >(num_cores);
+			// set->core_lru_list = misc::new_unique_array< misc::List<Block> >(num_cores);
+			set->core_lru_list.push_back(set->core_list1);
+			set->core_lru_list.push_back(set->core_list2);
+			set->core_lru_list.push_back(set->core_list3);
+			set->core_lru_list.push_back(set->core_list4);
 			for (int core_id=0; core_id<num_cores; core_id++) {
 				// Initialize LRU list for each core
 				// misc::List<Block> core_list;
