@@ -21,6 +21,8 @@
 #define LIB_CPP_LINKED_LIST_H
 
 #include <cassert>
+#include <stdlib.h>
+
 
 
 namespace misc
