@@ -224,10 +224,10 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 		// } else if (set->core_lru_list[core_id].getSize() > 1) {
 			std::cout << "access 3 core=" << core_id << " count=" << set->core_access_count[core_id] << "/" << set->core_access_count[num_cores];
 			std::cout << " list size=" << set->core_lru_list[core_id].getSize();
-			if (block) {
-				std::cout << " block!" << std::endl;
+			if (block->lru_node) {
+				std::cout << " node!" << std::endl;
 			} else {
-				std::cout << " no block :(" << std::endl;
+				std::cout << " no node :(" << std::endl;
 			}
 
 			set->core_lru_list[core_id].Erase(block->lru_node);
