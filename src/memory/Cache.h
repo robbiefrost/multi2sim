@@ -44,7 +44,8 @@ public:
 		ReplacementFIFO,
 		ReplacementRandom,
 		ReplacementLRUPartition,
-		ReplacementFLRU
+		ReplacementFLRU,
+		ReplacementFLRUPartition
 	};
 
 	/// String map for ReplacementPolicy
@@ -420,6 +421,69 @@ public:
             }
         }
         return nullptr;
+    };
+
+	///
+	/// *** helper functions for FLRU with dynamic partitioning ***
+	///
+
+    // iterate through M LRU to find own belonging ways
+    bool FLRUPartcheckMforBlock(unsigned set_id, unsigned way_id){
+        Set *set = getSet(set_id);
+        auto iter = set->lru_list.getTail();
+        for (unsigned i = 0; i < m_size; i++){
+            if ((*iter)->way_id == way_id){ return true; }
+            --iter;
+        }
+        return false;
+    };
+
+
+    // iterate through M LRU to find own belonging ways
+    Block* FLRUPartcheckForSelf(unsigned set_id, unsigned core_id){
+        Set *set = getSet(set_id);
+        auto iter = set->lru_list.getTail();
+        for (unsigned i = 0; i < m_size; i++){
+            unsigned curr_way_id = (*iter)->way_id;
+
+            if (set->way_owner[curr_way_id] == core_id){
+                return *iter;
+            }
+            --iter;
+
+        }
+        return nullptr;
+    };
+
+    Block* FLRUPartcheckForLowPriority(unsigned set_id, unsigned core_id){
+        Set *set = getSet(set_id);
+		auto iter = set->lru_list.getTail();
+		Block *victimBlock = nullptr;
+		for (unsigned i=0; i<num_ways; i++) {
+			int owner_core = set->way_owner[(*iter)->way_id];
+			if (set->core_access_count[core_id] > set->core_access_count[owner_core]) {
+				victimBlock = *iter;
+			}
+			--iter;
+		}
+        return victimBlock;
+    };
+
+	// find lowest frequency block in M
+    Block* FLRUPartgetLowFrequency(unsigned set_id){
+
+        Set *set = getSet(set_id);
+        auto iter = set->lru_list.getTail();
+        unsigned minFrequency = std::numeric_limits<unsigned int>::max();
+        Block *victimBlock = nullptr;
+        for (unsigned i = 0; i < m_size; i++){
+            if ((*iter)->counter < minFrequency){
+                victimBlock = *iter;
+                minFrequency = (*iter)->counter;
+            }
+            --iter;
+        }
+        return victimBlock;
     };
 
 };

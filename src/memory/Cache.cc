@@ -30,7 +30,8 @@ const misc::StringMap Cache::ReplacementPolicyMap =
 	{ "FIFO", ReplacementFIFO },
 	{ "Random", ReplacementRandom },
 	{ "LRU-p", ReplacementLRUPartition},
-	{ "FLRU", ReplacementFLRU}
+	{ "FLRU", ReplacementFLRU},
+	{ "FLRU-p", ReplacementFLRUPartition},
 };
 
 
@@ -172,6 +173,13 @@ void Cache::setBlock(unsigned set_id,
         block->counter++;
     }
 
+	// Increment frequency counter for FLRU
+	if (replacement_policy == ReplacementFLRUPartition){
+        block->counter++;
+		set->core_access_count[core_id]++;
+		set->core_access_count[num_cores]++;
+    }
+
 	// Set new values for block
 	block->tag = tag;
 	block->state = state;
@@ -234,6 +242,27 @@ void Cache::AccessBlock(unsigned set_id, unsigned way_id, int core_id)
 
         // Promotion according to current position
         if (FLRUcheckMforBlock(set_id, way_id)){
+            // Push to M position
+            set->lru_list.Insert(set->lru_list.FLRUgetMIter(m_size), block->lru_node);
+        } else {
+            // Push to MRU position
+            set->lru_list.PushFront(block->lru_node);
+        }
+
+    }
+
+
+	if (replacement_policy == ReplacementFLRUPartition){
+        // Increment frequency counter
+        block->counter++;
+		set->core_access_count[core_id]++;
+		set->core_access_count[num_cores]++;
+
+        // Remove block from lru list
+        set->lru_list.Erase(block->lru_node);
+
+        // Promotion according to current position
+        if (FLRUPartcheckMforBlock(set_id, way_id)){
             // Push to M position
             set->lru_list.Insert(set->lru_list.FLRUgetMIter(m_size), block->lru_node);
         } else {
@@ -349,6 +378,43 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
         return block->way_id;
     }
 
+	// FLRU with dynamic partitioning Replacement Policy
+	if (replacement_policy == ReplacementFLRUPartition){
+
+        Block *block = nullptr;
+        if (block = misc::cast<Block *>(FLRUPartcheckForSelf(set_id, core_id))){()
+            // Check if belonging ways are in M
+        } else if (block = misc::cast<Block *>(FLRUPartcheckForLowPriority(set_id, core_id))){
+            // Check if own ways are stolen in cache and clear record
+        } else {
+            // Select lowest priority (lowest frequency) block as victim
+            block = misc::cast<Block *>(FLRUPartgetLowFrequency(set_id));
+        }
+
+        // Reset frequency counter
+		// if (block->counter == 1) {
+		// 	//get core_id for original owner
+		// 	int original_owner = set->way_owner[block->way_id];
+		// 	set->core_access_count[original_owner]--;
+		// 	set->core_access_count[num_cores]--;
+
+		// }
+		int original_owner = set->way_owner[block->way_id];
+		resetAccessCount(set_id, core_id);
+		resetAccessCount(set_id, original_owner);
+        block->counter = 0;
+
+        // Record new owner of block
+        set->way_owner[block->way_id] = core_id;
+
+        // Insert node into M position
+        set->lru_list.Erase(block->lru_node);
+        set->lru_list.Insert(set->lru_list.FLRUgetMIter(m_size),
+							 block->lru_node);
+
+        return block->way_id;
+    }
+
 	// Random replacement policy
 	assert(replacement_policy == ReplacementRandom);
 	return random() % num_ways;
@@ -365,10 +431,6 @@ void Cache::setNumCores(int num_cores)
 			Set *set = getSet(set_id);
 			set->core_access_count = misc::new_unique_array<unsigned>(num_cores+1);
 			// set->core_lru_list = misc::new_unique_array< misc::List<Block> >(num_cores);
-			set->core_lru_list.push_back(set->core_list1);
-			set->core_lru_list.push_back(set->core_list2);
-			set->core_lru_list.push_back(set->core_list3);
-			set->core_lru_list.push_back(set->core_list4);
 			for (int core_id=0; core_id<num_cores; core_id++) {
 				// Initialize LRU list for each core
 				// misc::List<Block> core_list;
@@ -402,13 +464,32 @@ void Cache::setNumCores(int num_cores)
 			}
 		}
 	}
+
+	if (replacement_policy == ReplacementLRUPartition) {
+		for (unsigned set_id = 0; set_id < num_sets; set_id++) {
+			Set *set = getSet(set_id);
+			set->way_owner = misc::new_unique_array<int>(num_ways);
+			set->core_access_count = misc::new_unique_array<unsigned>(num_cores+1);
+			for (unsigned way_id = 0; way_id < num_ways; way_id++) {
+				if (way_id < num_cores) {
+					set->way_owner[way_id] = way_id;
+				} else {
+					set->way_owner[way_id] = -1;
+				}
+			}
+			for (int core_id=0; core_id<num_cores; core_id++) {
+				set->core_access_count[core_id] = 0;
+			}
+			set->core_access_count[num_cores] = num_cores;
+		}
+	}
 }
 
 
 void Cache::resetAccessCount(int set_id, int core_id) {
 	Set *set = getSet(set_id);
 	unsigned new_count = set->core_access_count[num_cores] / num_cores;
-	// set->core_access_count[num_cores] -= (set->core_access_count[core_id] - new_count);
+	set->core_access_count[num_cores] -= (set->core_access_count[core_id] - new_count);
 	set->core_access_count[core_id] = new_count;
 }
 
