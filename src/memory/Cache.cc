@@ -399,9 +399,10 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 		// 	set->core_access_count[num_cores]--;
 
 		// }
-		int original_owner = set->way_owner[block->way_id];
-		resetAccessCount(set_id, core_id);
-		resetAccessCount(set_id, original_owner);
+
+		// int original_owner = set->way_owner[block->way_id];
+		// resetAccessCount(set_id, core_id);
+		// resetAccessCount(set_id, original_owner);
         block->counter = 0;
 
         // Record new owner of block
@@ -465,7 +466,7 @@ void Cache::setNumCores(int num_cores)
 		}
 	}
 
-	if (replacement_policy == ReplacementLRUPartition) {
+	if (replacement_policy == ReplacementFLRUPartition) {
 		for (unsigned set_id = 0; set_id < num_sets; set_id++) {
 			Set *set = getSet(set_id);
 			set->way_owner = misc::new_unique_array<int>(num_ways);

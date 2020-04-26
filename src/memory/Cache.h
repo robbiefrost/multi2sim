@@ -154,10 +154,6 @@ private:
 		std::unique_ptr<int[]> way_owner;
 
 		// Array of block lists for each core
-		misc::List<Block> core_list1;
-		misc::List<Block> core_list2;
-		misc::List<Block> core_list3;
-		misc::List<Block> core_list4;
 		std::vector< misc::List<Block> > core_lru_list;
 		// std::unique_ptr< misc::List<Block>[] > core_lru_list;
 	};
