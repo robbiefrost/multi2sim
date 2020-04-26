@@ -400,9 +400,9 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 
 		// }
 
-		// int original_owner = set->way_owner[block->way_id];
-		// resetAccessCount(set_id, core_id);
-		// resetAccessCount(set_id, original_owner);
+		int original_owner = set->way_owner[block->way_id];
+		resetAccessCount(set_id, core_id);
+		resetAccessCount(set_id, original_owner);
         block->counter = 0;
 
         // Record new owner of block
