@@ -382,7 +382,7 @@ unsigned Cache::ReplaceBlock(unsigned set_id, int core_id)
 	if (replacement_policy == ReplacementFLRUPartition){
 
         Block *block = nullptr;
-        if (block = misc::cast<Block *>(FLRUPartcheckForSelf(set_id, core_id))){()
+        if (block = misc::cast<Block *>(FLRUPartcheckForSelf(set_id, core_id))){
             // Check if belonging ways are in M
         } else if (block = misc::cast<Block *>(FLRUPartcheckForLowPriority(set_id, core_id))){
             // Check if own ways are stolen in cache and clear record
