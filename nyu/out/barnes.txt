@@ -1,0 +1,50 @@
+Barnes Benchmark
+
+
+lru Policy
+
+		Hack code: Plummer model
+
+     nbody     dtime       eps       tol     dtout     tstop    fcells     NPROC
+       256   0.02500    0.0500      1.00     0.250     0.075      2.00         4
+
+COMPUTESTART  =   1587965349
+COMPUTEEND    =   1587966698
+COMPUTETIME   =         1349
+TRACKTIME     =          678
+PARTITIONTIME =            3	 0.00
+TREEBUILDTIME =           57	 0.08
+FORCECALCTIME =          609	 0.90
+RESTTIME      =            9	 0.01
+
+flru Policy
+
+		Hack code: Plummer model
+
+     nbody     dtime       eps       tol     dtout     tstop    fcells     NPROC
+       256   0.02500    0.0500      1.00     0.250     0.075      2.00         4
+
+COMPUTESTART  =   1587966725
+COMPUTEEND    =   1587968060
+COMPUTETIME   =         1335
+TRACKTIME     =          670
+PARTITIONTIME =            3	 0.00
+TREEBUILDTIME =           56	 0.08
+FORCECALCTIME =          598	 0.89
+RESTTIME      =           13	 0.02
+
+flrup Policy
+
+		Hack code: Plummer model
+
+     nbody     dtime       eps       tol     dtout     tstop    fcells     NPROC
+       256   0.02500    0.0500      1.00     0.250     0.075      2.00         4
+
+COMPUTESTART  =   1587968087
+COMPUTEEND    =   1587969423
+COMPUTETIME   =         1336
+TRACKTIME     =          670
+PARTITIONTIME =            3	 0.00
+TREEBUILDTIME =           57	 0.09
+FORCECALCTIME =          598	 0.89
+RESTTIME      =           12	 0.02

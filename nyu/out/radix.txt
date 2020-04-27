@@ -1,0 +1,68 @@
+Radix Benchmark ( -p4 -n16384 )
+
+
+lru Policy
+
+Integer Radix Sort
+     16384 Keys
+     4 Processors
+     Radix = 1024
+     Max key = 67108864
+
+
+                 PROCESS STATISTICS
+               Total            Rank            Sort
+ Proc          Time             Time            Time
+    0            122              62              60
+
+                 TIMING INFORMATION
+Start time                        :       1587965324
+Initialization finish time        :       1587965709
+Overall finish time               :       1587965831
+Total time with initialization    :              507
+Total time without initialization :              122
+
+
+flru Policy
+
+Integer Radix Sort
+     16384 Keys
+     4 Processors
+     Radix = 1024
+     Max key = 67108864
+
+
+                 PROCESS STATISTICS
+               Total            Rank            Sort
+ Proc          Time             Time            Time
+    0            123              61              61
+
+                 TIMING INFORMATION
+Start time                        :       1587965834
+Initialization finish time        :       1587966222
+Overall finish time               :       1587966345
+Total time with initialization    :              511
+Total time without initialization :              123
+
+
+flrup Policy
+
+Integer Radix Sort
+     16384 Keys
+     4 Processors
+     Radix = 1024
+     Max key = 67108864
+
+
+                 PROCESS STATISTICS
+               Total            Rank            Sort
+ Proc          Time             Time            Time
+    0            123              61              61
+
+                 TIMING INFORMATION
+Start time                        :       1587966347
+Initialization finish time        :       1587966734
+Overall finish time               :       1587966857
+Total time with initialization    :              510
+Total time without initialization :              123
+

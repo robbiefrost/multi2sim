@@ -1,0 +1,65 @@
+LU-CONT Benchmark ( -p4 -n128 )
+
+
+lru Policy
+
+Blocked Dense LU Factorization
+     128 by 128 Matrix
+     4 Processors
+     16 by 16 Element Blocks
+
+
+                            PROCESS STATISTICS
+              Total      Diagonal     Perimeter      Interior       Barrier
+ Proc         Time         Time         Time           Time          Time
+    0           336             1            55           167           113
+
+                            TIMING INFORMATION
+Start time                        :       1587965324
+Initialization finish time        :       1587965455
+Overall finish time               :       1587965791
+Total time with initialization    :              467
+Total time without initialization :              336
+
+
+flru Policy
+
+Blocked Dense LU Factorization
+     128 by 128 Matrix
+     4 Processors
+     16 by 16 Element Blocks
+
+
+                            PROCESS STATISTICS
+              Total      Diagonal     Perimeter      Interior       Barrier
+ Proc         Time         Time         Time           Time          Time
+    0           336             3            53           165           115
+
+                            TIMING INFORMATION
+Start time                        :       1587965793
+Initialization finish time        :       1587965924
+Overall finish time               :       1587966261
+Total time with initialization    :              468
+Total time without initialization :              337
+
+
+flrup Policy
+
+Blocked Dense LU Factorization
+     128 by 128 Matrix
+     4 Processors
+     16 by 16 Element Blocks
+
+
+                            PROCESS STATISTICS
+              Total      Diagonal     Perimeter      Interior       Barrier
+ Proc         Time         Time         Time           Time          Time
+    0           334             1            54           166           113
+
+                            TIMING INFORMATION
+Start time                        :       1587966263
+Initialization finish time        :       1587966394
+Overall finish time               :       1587966728
+Total time with initialization    :              465
+Total time without initialization :              334
+

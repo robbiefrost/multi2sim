@@ -1,0 +1,143 @@
+FFT Benchmark ( -p4 -m16 )
+
+
+lru Policy
+
+FFT with Blocking Transpose
+   65536 Complex Doubles
+   4 Processors
+   65536 Cache lines
+   16 Byte line size
+   4096 Bytes per page
+
+iter_num = 64
+iter_num = 64
+iter_num = 64
+iter_num = 64
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+FFt1DOnce: iter_num = 1024
+Step 1:       73
+Step 2:      991
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+Step 3:       64
+Step 4:      902
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+Step 5:       51
+
+                 PROCESS STATISTICS
+            Computation      Transpose     Transpose
+ Proc          Time            Time        Fraction
+    0              2082            188       0.09030
+
+                 TIMING INFORMATION
+Start time                        :       1587965324
+Initialization finish time        :       1587967091
+Overall finish time               :       1587969173
+Total time with initialization    :             3849
+Total time without initialization :             2082
+Overall transpose time            :              188
+Overall transpose fraction        :          0.09030
+
+
+flru Policy
+
+FFT with Blocking Transpose
+   65536 Complex Doubles
+   4 Processors
+   65536 Cache lines
+   16 Byte line size
+   4096 Bytes per page
+
+iter_num = 64
+iter_num = 64
+iter_num = 64
+iter_num = 64
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+FFt1DOnce: iter_num = 1024
+Step 1:       66
+Step 2:      994
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+Step 3:       63
+Step 4:      900
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+Step 5:       49
+
+                 PROCESS STATISTICS
+            Computation      Transpose     Transpose
+ Proc          Time            Time        Fraction
+    0              2075            178       0.08578
+
+                 TIMING INFORMATION
+Start time                        :       1587969175
+Initialization finish time        :       1587970949
+Overall finish time               :       1587973024
+Total time with initialization    :             3849
+Total time without initialization :             2075
+Overall transpose time            :              178
+Overall transpose fraction        :          0.08578
+
+
+flrup Policy
+
+FFT with Blocking Transpose
+   65536 Complex Doubles
+   4 Processors
+   65536 Cache lines
+   16 Byte line size
+   4096 Bytes per page
+
+iter_num = 64
+iter_num = 64
+iter_num = 64
+iter_num = 64
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+FFt1DOnce: iter_num = 1024
+Step 1:       68
+Step 2:      982
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+Step 3:       73
+Step 4:      883
+Transpose: iter_num = 0
+Transpose: iter_num = 4096
+Transpose: iter_num = 8192
+Transpose: iter_num = 12288
+Step 5:       51
+
+                 PROCESS STATISTICS
+            Computation      Transpose     Transpose
+ Proc          Time            Time        Fraction
+    0              2059            192       0.09325
+
+                 TIMING INFORMATION
+Start time                        :       1587973026
+Initialization finish time        :       1587974778
+Overall finish time               :       1587976837
+Total time with initialization    :             3811
+Total time without initialization :             2059
+Overall transpose time            :              192
+Overall transpose fraction        :          0.09325
+
