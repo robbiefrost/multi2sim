@@ -1,0 +1,36 @@
+Multicore Processors Final Project
+
+Robert Frost
+Anthony Tse (at4091@nyu.edu)
+
+This folder is to run simulations of shared cache replacement algorithms on Multi2Sim simulator.
+
+
+Step 1:
+
+This simulator is intended to run on NYU crunchy cluster. Move file and ssh to crunchy.
+
+Step 2:
+
+To run, first compile this version of Multi2Sim according to instructions from github:
+
+	$> libtoolize
+	$> aclocal
+	$> autoconf
+	$> automake --add-missing
+	$> ./configure
+	$> make 
+
+Step 3: 
+
+cd to this directory "multi2sim/nyu". Scripts made use relative address.
+
+Step 4:
+
+	The following script runs the barnes, fft, radix, and lu-cont benchmarks with predetermined program parameters. Each benchmark will be run in separate processes using screen. 
+
+	$> ./run.sh
+
+
+In this testing the LRU, FLRU, and FLURP cache replacement policies are tested for each benchmark.
+
