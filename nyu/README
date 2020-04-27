@@ -3,7 +3,7 @@ Multicore Processors Final Project
 Robert Frost (raf492@nyu.edu)
 Anthony Tse (at4091@nyu.edu)
 
-The main source code for this project lives on github, as we had to adapt multi2sim which is too large to submit. However, we have included Cache.h and Cache.cc from multi2sim/src/memory with this submission, as they contain the majority of our work. Additional changes were made to multi2sim in order to pass core information to the cache.
+The multi2sim folder contains the source code for this project, which is also available on github (easier to install from there). The bulk of our work was done in Cache.h and Cache.cc from multi2sim/src/memory, so we have also copied those files to the top level of our submission for easy inspection. Additional changes were made throughout the simulator in order to pass information about the cores to the cache.
 
 Instructions to test the code:
 
@@ -13,11 +13,11 @@ Clone the repository
 	git clone https://github.com/robbiefrost/multi2sim
 
 Setup 2:
-Build the simulator according to the instructions in the repository's readme. This may take a few minutes.
+Build the simulator according to the instructions in the repository's readme. This will take some time (ignore the warnings).
 	
 	cd multi2sim && libtoolize && aclocal && autoconf && automake --add-missing && ./configure && make
 
 Testing:
-In "multi2sim/nyu" we have scripts for running various splash benchmarks, as well as a very basic test script (test-threads.sh). The scripts use the configurations in "nyu/config" to test different L2 shared cache replacement policies. Using run.sh will run the barnes, fft, radix, and lu-cont benchmarks with predetermined program parameters. Each benchmark will be run in separate processes using screen.
+In "multi2sim/nyu" we have scripts for running various splash benchmarks, as well as a very basic test script (test-threads.sh). The scripts use the configurations in "nyu/config" to test different L2 shared cache replacement policies. Using run.sh will run the barnes, fft, radix, and lu-cont benchmarks with predetermined program parameters. Each benchmark will be run in separate processes using screen. You may have to do chmod 777 to run the shell scripts.
 
 
