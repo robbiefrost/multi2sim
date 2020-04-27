@@ -1,36 +1,23 @@
 Multicore Processors Final Project
 
-Robert Frost
+Robert Frost (raf492@nyu.edu)
 Anthony Tse (at4091@nyu.edu)
 
-This folder is to run simulations of shared cache replacement algorithms on Multi2Sim simulator.
+The main source code for this project lives on github, as we had to adapt multi2sim which is too large to submit. However, we have included Cache.h and Cache.cc from multi2sim/src/memory with this submission, as they contain the majority of our work. Additional changes were made to multi2sim in order to pass core information to the cache.
 
+Instructions to test the code:
 
-Step 1:
+Setup 1:
+Clone the repository
+	
+	git clone https://github.com/robbiefrost/multi2sim
 
-This simulator is intended to run on NYU crunchy cluster. Move file and ssh to crunchy.
+Setup 2:
+Build the simulator according to the instructions in the repository's readme. This may take a few minutes.
+	
+	cd multi2sim && libtoolize && aclocal && autoconf && automake --add-missing && ./configure && make
 
-Step 2:
+Testing:
+In "multi2sim/nyu" we have scripts for running various splash benchmarks, as well as a very basic test script (test-threads.sh). The scripts use the configurations in "nyu/config" to test different L2 shared cache replacement policies. Using run.sh will run the barnes, fft, radix, and lu-cont benchmarks with predetermined program parameters. Each benchmark will be run in separate processes using screen.
 
-To run, first compile this version of Multi2Sim according to instructions from github:
-
-	$> libtoolize
-	$> aclocal
-	$> autoconf
-	$> automake --add-missing
-	$> ./configure
-	$> make 
-
-Step 3: 
-
-cd to this directory "multi2sim/nyu". Scripts made use relative address.
-
-Step 4:
-
-	The following script runs the barnes, fft, radix, and lu-cont benchmarks with predetermined program parameters. Each benchmark will be run in separate processes using screen. 
-
-	$> ./run.sh
-
-
-In this testing the LRU, FLRU, and FLURP cache replacement policies are tested for each benchmark.
 
